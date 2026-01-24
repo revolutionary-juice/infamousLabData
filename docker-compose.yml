@@ -17,12 +17,12 @@ services:
       timeout: 3s
       retries: 20
     networks:
-      - analytics_net
+      - infamous_analytics
 
   redis:
     image: redis:7-alpine
     networks:
-      - analytics_net
+      - infamous_analytics
 
   redash-init:
     image: redash/redash:10.1.0.b50633
@@ -39,8 +39,7 @@ services:
       PYTHONUNBUFFERED: "0"
     command: bash -lc "python /app/manage.py database create_tables"
     networks:
-      - analytics_net
-
+      - infamous_analytics
 
   redash-server:
     image: redash/redash:10.1.0.b50633
@@ -58,7 +57,7 @@ services:
       - "5000:5000"
     command: server
     networks:
-      - analytics_net
+      - infamous_analytics
 
   redash-scheduler:
     image: redash/redash:10.1.0.b50633
@@ -72,7 +71,7 @@ services:
       PYTHONUNBUFFERED: "0"
     command: scheduler
     networks:
-      - analytics_net
+      - infamous_analytics
 
   redash-worker:
     image: redash/redash:10.1.0.b50633
@@ -88,7 +87,7 @@ services:
       PYTHONUNBUFFERED: "0"
     command: worker
     networks:
-      - analytics_net
+      - infamous_analytics
 
   generator:
     build: ./generator
@@ -105,8 +104,7 @@ services:
       PERIOD_SEC: "1"
     command: ["python", "-u", "app.py"]
     networks:
-      - analytics_net
-
+      - infamous_analytics
 
   jupyter:
     build: ./notebook
@@ -118,11 +116,11 @@ services:
       JUPYTER_ENABLE_LAB: "yes"
     command: start-notebook.sh --NotebookApp.token='' --NotebookApp.password=''
     networks:
-      - analytics_net
+      - infamous_analytics
 
 volumes:
   pgdata:
 
 networks:
-  analytics_net:
+  infamous_analytics:
     driver: bridge
