@@ -5,8 +5,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-    ports:
-      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./db/00_create_dbs.sql:/docker-entrypoint-initdb.d/00_create_dbs.sql:ro
@@ -16,13 +14,9 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
-    networks:
-      - infamous_analytics
 
   redis:
     image: redis:7-alpine
-    networks:
-      - infamous_analytics
 
   redash-init:
     image: redash/redash:10.1.0.b50633
@@ -38,8 +32,6 @@ services:
       REDASH_SECRET_KEY: ${REDASH_SECRET_KEY}
       PYTHONUNBUFFERED: "0"
     command: bash -lc "python /app/manage.py database create_tables"
-    networks:
-      - infamous_analytics
 
   redash-server:
     image: redash/redash:10.1.0.b50633
@@ -56,8 +48,6 @@ services:
     ports:
       - "5000:5000"
     command: server
-    networks:
-      - infamous_analytics
 
   redash-scheduler:
     image: redash/redash:10.1.0.b50633
@@ -70,8 +60,6 @@ services:
       REDASH_SECRET_KEY: ${REDASH_SECRET_KEY}
       PYTHONUNBUFFERED: "0"
     command: scheduler
-    networks:
-      - infamous_analytics
 
   redash-worker:
     image: redash/redash:10.1.0.b50633
@@ -86,8 +74,6 @@ services:
       WORKERS_COUNT: 2
       PYTHONUNBUFFERED: "0"
     command: worker
-    networks:
-      - infamous_analytics
 
   generator:
     build: ./generator
@@ -103,8 +89,6 @@ services:
       PLAYER_NAME: Cole_MacGrath
       PERIOD_SEC: "1"
     command: ["python", "-u", "app.py"]
-    networks:
-      - infamous_analytics
 
   jupyter:
     build: ./notebook
@@ -115,12 +99,6 @@ services:
     environment:
       JUPYTER_ENABLE_LAB: "yes"
     command: start-notebook.sh --NotebookApp.token='' --NotebookApp.password=''
-    networks:
-      - infamous_analytics
 
 volumes:
   pgdata:
-
-networks:
-  infamous_analytics:
-    driver: bridge
